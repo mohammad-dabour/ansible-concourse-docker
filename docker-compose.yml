@@ -1,0 +1,44 @@
+version: '3.5'
+services:
+ consul:
+   command: -server -bootstrap
+   image: progrium/consul:latest
+   container_name: consul
+   hostname: "consul"
+   labels:
+     SERVICE_IGNORE: 'yes'
+   ports:
+   - "8500:8500"
+   - "8400:8400"
+   - "8600:53"
+
+ wiki-app:
+  container_name: wikigoapp
+  image: mdab0ur/wikigoapp
+  depends_on:
+    - consul
+  links:
+  - consul
+  ports:
+   - "4080:4080"
+ nginx:
+   container_name: nginx
+   image: mdab0ur/concourse
+   depends_on:
+    - consul
+   links:
+   - consul
+   ports:
+   - "80:80"
+
+
+ registrator:
+   command: "-internal consul://consul:8500"
+   image: gliderlabs/registrator:latest
+   container_name: registrator
+   depends_on:
+    - consul
+   links:
+    - consul
+   volumes:
+   - "/var/run/docker.sock:/tmp/docker.sock"

@@ -1,0 +1,64 @@
+---
+- hosts: gcp
+  remote_user: "{{ remoteUser }}"
+  tasks:
+     - name: install dependacies
+       yum: pkg={{item}} state=latest
+       with_items:
+         - yum-utils
+         - device-mapper-persistent-data
+         - lvm2
+
+     - name: install docker repository
+       command:  yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+     - name: enable test 
+       command: yum-config-manager --enable docker-ce-edge
+
+     - name: enable  edge
+       command: yum-config-manager --enable docker-ce-test
+
+     - name: Install docker
+       yum:
+        name: docker-ce
+        state: latest
+
+     - name: service running
+       service:
+          name: docker
+          state: started
+          enabled: yes
+
+     - name: making sure pip installed
+       shell: curl -sSL https://bootstrap.pypa.io/get-pip.py | python
+     
+     - name: pip install and update.
+       command: pip install --upgrade --force-reinstall --no-cache-dir docker-compose
+
+
+     - name: copy the file
+       copy:
+         src: /tmp/docker-compose.yml
+         dest: /tmp/docker-compose.yml
+
+     - name: Log into DockerHub
+       docker_login:
+         username: "{{ user }}"
+         password: "{{ pass }}"
+         email: "muhammad.mdabour@gmail.com"
+
+     - name: making sure pip installed
+       shell: |
+             export HOST_IP=$(ifconfig eth0 | grep 'inet '|cut -d: -f2 | awk '{ print $2 }')
+
+     - name: "Docker compose consumer"
+       docker_service:
+          project_src: /tmp
+          build: no
+          restarted: true
+       register: output
+
+     - name: clean out
+       file: 
+         state: absent
+         path: /tmp/docker-compose.yml
