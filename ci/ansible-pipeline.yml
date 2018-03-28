@@ -11,8 +11,8 @@ resources:
 - name: ansible-docker
   type: docker-image
   source:
-    repository: {{reg_address}}
-    insecure_registries: [{{reg_host}}] 
+    repository: ((reg_address)):5000/ansible
+    insecure_registries: ["((reg_address)):5000"]
 
 jobs:
 - name: build-deployer
