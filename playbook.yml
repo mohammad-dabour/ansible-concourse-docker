@@ -47,9 +47,6 @@
          password: "{{ pass }}"
          email: "muhammad.mdabour@gmail.com"
 
-     - name: making sure pip installed
-       shell: |
-             export HOST_IP=$(ifconfig eth0 | grep 'inet '|cut -d: -f2 | awk '{ print $2 }')
 
      - name: "Docker compose consumer"
        docker_service:
