@@ -45,7 +45,7 @@
        docker_login:
          username: "{{ user }}"
          password: "{{ pass }}"
-         email: "muhammad.mdabour@gmail.com"
+         email: "XXXXX@YYYY.com"
 
 
      - name: "Docker compose consumer"
